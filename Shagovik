@@ -1,0 +1,50 @@
+// пины для подключения контактов STEP, DIR
+#define PIN_STEP 3
+#define PIN_DIR 2
+
+// количество шагов на 1 оборот
+#define STEP_ROUND 200
+
+// скорость двигателя об/мин
+#define SPEED 150
+
+// обороты на закрытие
+#define LOCK_ROTATIONS 3
+
+void setup() {
+// режим для STEP и DIR как OUTPUT
+pinMode(PIN_STEP, OUTPUT);
+pinMode(PIN_DIR, OUTPUT);
+// начальные значения
+digitalWrite(PIN_STEP, 1);
+digitalWrite(PIN_DIR, 0);
+Serial.begin(9600);
+}
+
+void rotate(int dir, int turns, int spd){
+    unsigned int impulseDelay = (unsigned long)(30ul * 1000 * 1000) / ((unsigned long)spd * (unsigned long)STEP_ROUND);
+    digitalWrite(PIN_DIR, dir);
+    for(int i = 0; i < turns; i++) {
+       for(int j = 0; j < STEP_ROUND; j++) {
+            digitalWrite(PIN_STEP, HIGH);
+            delayMicroseconds(impulseDelay);
+            digitalWrite(PIN_STEP, LOW);
+            delayMicroseconds(impulseDelay);
+        }
+    }
+}
+
+void lock(){
+    rotate(HIGH, LOCK_ROTATIONS, SPEED);
+}
+
+void unlock(){
+    rotate(LOW, LOCK_ROTATIONS, SPEED);
+}
+
+void loop() {
+    lock();
+    delay(3000);
+    unlock();
+    delay(3000);
+}
